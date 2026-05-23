@@ -6,6 +6,7 @@ const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const initSqlJs = require('sql.js');
+const geoip = require('geoip-lite');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -199,6 +200,40 @@ if (!fs.existsSync(VIDEOS_DIR)) fs.mkdirSync(VIDEOS_DIR, { recursive: true });
 
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use('/videos', express.static(VIDEOS_DIR));
+
+// ============ GEO BLOCK: Block Vietnam IPs ============
+const BLOCKED_COUNTRIES = process.env.BLOCKED_COUNTRIES ? process.env.BLOCKED_COUNTRIES.split(',') : ['VN'];
+
+app.use((req, res, next) => {
+  // Skip block for admin panel
+  if (req.path.startsWith('/secret-admin-panel')) {
+    return next();
+  }
+
+  // Skip health check
+  if (req.path === '/health') {
+    return next();
+  }
+
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.socket.remoteAddress;
+  const geo = geoip.lookup(ip);
+
+  if (geo && BLOCKED_COUNTRIES.includes(geo.country)) {
+    // Return 403 Forbidden
+    return res.status(403).send(`
+      <html><head><title>Access Denied</title></head>
+      <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5;">
+        <div style="text-align: center; padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <h1 style="color: #dc2626; margin-bottom: 1rem;">403 - Access Denied</h1>
+          <p style="color: #666;">This website is not available in your region.</p>
+        </div>
+      </body></html>
+    `);
+  }
+
+  next();
+});
+// ==============================================
 
 // Multer config for all uploads (images and videos)
 const storage = multer.diskStorage({
