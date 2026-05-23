@@ -181,7 +181,15 @@
                         </div>
                     </div>
                     <p id="video-name" class="hidden text-sm text-gray-500 mt-2"></p>
+                    <div id="thumbnail-note" class="text-xs text-gray-400 mt-2 hidden">
+                        <span class="inline-flex items-center gap-1">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Thumbnail will be auto-extracted from video
+                        </span>
+                    </div>
                 </div>
+
+                <input type="hidden" id="auto-thumbnail">
 
                 <!-- Error -->
                 <div id="editor-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl"></div>
@@ -375,20 +383,65 @@
             }
         });
 
-        // Video preview
+        // Video preview and thumbnail extraction
         document.getElementById('edit-video').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                // Show video preview
                 const reader = new FileReader();
                 reader.onload = function(ev) {
                     document.getElementById('preview-video').src = ev.target.result;
                     document.getElementById('video-preview').classList.remove('hidden');
                     document.getElementById('video-name').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
                     document.getElementById('video-name').classList.remove('hidden');
+                    document.getElementById('thumbnail-note').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
+
+                // Extract thumbnail from video
+                extractVideoThumbnail(file);
             }
         });
+
+        // Extract thumbnail from video
+        function extractVideoThumbnail(file) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.muted = true;
+            video.playsInline = true;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            video.onloadedmetadata = function() {
+                // Seek to 10% of video duration or 1 second, whichever is smaller
+                const seekTime = Math.min(video.duration * 0.1, 1);
+                video.currentTime = seekTime;
+            };
+
+            video.onseeked = function() {
+                // Set canvas size (16:9 aspect ratio)
+                canvas.width = 640;
+                canvas.height = 360;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert to data URL
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                document.getElementById('preview-img').src = dataUrl;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('auto-thumbnail').value = dataUrl;
+                document.getElementById('thumbnail-note').classList.remove('hidden');
+
+                URL.revokeObjectURL(video.src);
+            };
+
+            video.onerror = function() {
+                console.log('Could not extract thumbnail from video');
+                document.getElementById('thumbnail-note').classList.add('hidden');
+            };
+
+            video.src = URL.createObjectURL(file);
+        }
 
         // Format file size
         function formatFileSize(bytes) {
@@ -425,8 +478,21 @@
             formData.append('content', document.getElementById('edit-content').value);
 
             const imageFile = document.getElementById('edit-image').files[0];
+            const autoThumbnail = document.getElementById('auto-thumbnail').value;
+
             if (imageFile) {
                 formData.append('image', imageFile);
+            } else if (autoThumbnail && !document.getElementById('edit-existing-image').value) {
+                // Convert data URL to blob and append
+                const byteString = atob(autoThumbnail.split(',')[1]);
+                const mimeType = autoThumbnail.split(',')[0].match(/:(.*?);/)[1];
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                const blob = new Blob([ab], { type: mimeType });
+                formData.append('image', blob, 'video-thumb.jpg');
             }
 
             // Send existing image path (from AI generate or edit)
