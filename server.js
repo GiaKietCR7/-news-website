@@ -6,7 +6,6 @@ const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const initSqlJs = require('sql.js');
-const geoip = require('geoip-lite');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -201,25 +200,27 @@ if (!fs.existsSync(VIDEOS_DIR)) fs.mkdirSync(VIDEOS_DIR, { recursive: true });
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use('/videos', express.static(VIDEOS_DIR));
 
-// ============ GEO BLOCK: Block Vietnam IPs ============
-const BLOCKED_COUNTRIES = process.env.BLOCKED_COUNTRIES ? process.env.BLOCKED_COUNTRIES.split(',') : ['VN'];
+// ============ GEO BLOCK: Block Vietnam IPs (Simple IP Prefix Matching) ============
+const VN_IP_PREFIXES = [
+  '14.', '42.', '101.', '102.', '103.', '106.', '111.', '112.', '113.', '115.',
+  '116.', '117.', '118.', '119.', '171.', '175.', '203.', '210.', '222.', '223.'
+];
+
+function isVietnameseIP(ip) {
+  if (!ip) return false;
+  const cleanIP = ip.replace(/^::ffff:/, '').split(':')[0];
+  for (const prefix of VN_IP_PREFIXES) {
+    if (cleanIP.startsWith(prefix)) return true;
+  }
+  return false;
+}
 
 app.use((req, res, next) => {
-  // Skip block for admin panel
-  if (req.path.startsWith('/secret-admin-panel')) {
+  if (req.path.startsWith('/secret-admin-panel') || req.path === '/health') {
     return next();
   }
-
-  // Skip health check
-  if (req.path === '/health') {
-    return next();
-  }
-
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.socket.remoteAddress;
-  const geo = geoip.lookup(ip);
-
-  if (geo && BLOCKED_COUNTRIES.includes(geo.country)) {
-    // Return 403 Forbidden
+  if (isVietnameseIP(ip)) {
     return res.status(403).send(`
       <html><head><title>Access Denied</title></head>
       <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5;">
@@ -230,7 +231,6 @@ app.use((req, res, next) => {
       </body></html>
     `);
   }
-
   next();
 });
 // ==============================================
