@@ -9,16 +9,24 @@ const initSqlJs = require('sql.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_PATH = path.join(__dirname, 'database.sqlite');
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'database.sqlite');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
 let db;
 
 async function initDatabase() {
   const SQL = await initSqlJs();
 
+  // Ensure data directory exists
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  const dbFilePath = path.join(DATA_DIR, 'database.sqlite');
+
   // Load existing database or create new one
-  if (fs.existsSync(DB_PATH)) {
-    const buffer = fs.readFileSync(DB_PATH);
+  if (fs.existsSync(dbFilePath)) {
+    const buffer = fs.readFileSync(dbFilePath);
     db = new SQL.Database(buffer);
   } else {
     db = new SQL.Database();
@@ -166,7 +174,8 @@ async function initDatabase() {
 function saveDatabase() {
   const data = db.export();
   const buffer = Buffer.from(data);
-  fs.writeFileSync(DB_PATH, buffer);
+  const dbFilePath = path.join(DATA_DIR, 'database.sqlite');
+  fs.writeFileSync(dbFilePath, buffer);
 }
 
 // Middleware
@@ -182,12 +191,21 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
+// Ensure directories exist
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
+const VIDEOS_DIR = path.join(DATA_DIR, 'videos');
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+if (!fs.existsSync(VIDEOS_DIR)) fs.mkdirSync(VIDEOS_DIR, { recursive: true });
+
+app.use('/uploads', express.static(UPLOADS_DIR));
+app.use('/videos', express.static(VIDEOS_DIR));
+
 // Multer config for all uploads (images and videos)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const isVideo = /mp4|webm|mov|avi|mkv/.test(path.extname(file.originalname).toLowerCase());
-    const folder = isVideo ? 'videos' : 'uploads';
-    cb(null, path.join(__dirname, 'public', folder));
+    const folder = isVideo ? VIDEOS_DIR : UPLOADS_DIR;
+    cb(null, folder);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
