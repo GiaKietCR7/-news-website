@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(node server.js)",
+      "Bash(curl -s -c /tmp/cookies.txt -b /tmp/cookies.txt -X POST http://localhost:3000/api/admin/login -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":\"admin123\"}')",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:3000/secret-admin-panel/)",
+      "Bash(curl -s -b /tmp/cookies.txt http://localhost:3000/secret-admin-panel/categories)"
+    ]
+  }
+}
