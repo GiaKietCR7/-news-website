@@ -314,10 +314,14 @@
             document.getElementById('image-preview').classList.add('hidden');
             document.getElementById('video-preview').classList.add('hidden');
             document.getElementById('video-name').classList.add('hidden');
+            document.getElementById('thumbnail-note').classList.add('hidden');
             document.getElementById('edit-existing-image').value = '';
             document.getElementById('edit-existing-video').value = '';
+            document.getElementById('auto-thumbnail').value = '';
             document.getElementById('editor-error').classList.add('hidden');
             document.getElementById('upload-progress').classList.add('hidden');
+            document.getElementById('preview-img').src = '';
+            document.getElementById('preview-video').src = '';
         }
 
         // Edit existing article
@@ -480,10 +484,14 @@
             const imageFile = document.getElementById('edit-image').files[0];
             const autoThumbnail = document.getElementById('auto-thumbnail').value;
 
-            if (imageFile) {
+            // Send existing image path (from AI generate or edit)
+            const existingImage = document.getElementById('edit-existing-image').value;
+            if (existingImage) {
+                formData.append('existing_image', existingImage);
+            } else if (imageFile) {
                 formData.append('image', imageFile);
-            } else if (autoThumbnail && !document.getElementById('edit-existing-image').value) {
-                // Convert data URL to blob and append
+            } else if (autoThumbnail) {
+                // Convert data URL to blob and append (from video thumbnail extraction)
                 const byteString = atob(autoThumbnail.split(',')[1]);
                 const mimeType = autoThumbnail.split(',')[0].match(/:(.*?);/)[1];
                 const ab = new ArrayBuffer(byteString.length);
@@ -493,12 +501,6 @@
                 }
                 const blob = new Blob([ab], { type: mimeType });
                 formData.append('image', blob, 'video-thumb.jpg');
-            }
-
-            // Send existing image path (from AI generate or edit)
-            const existingImage = document.getElementById('edit-existing-image').value;
-            if (existingImage) {
-                formData.append('existing_image', existingImage);
             }
 
             // Handle video
