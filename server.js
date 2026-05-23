@@ -271,14 +271,20 @@ app.use((req, res, next) => {
   console.log(`[GEO] IP: ${clientIP}, Path: ${req.path}`);
 
   if (isVietnameseIP(clientIP)) {
-    return res.status(403).send(`
-      <html><head><title>Access Denied</title></head>
-      <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5;">
-        <div style="text-align: center; padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          <h1 style="color: #dc2626; margin-bottom: 1rem;">403 - Access Denied</h1>
-          <p style="color: #666;">This website is not available in your region.</p>
-        </div>
-      </body></html>
+    // Return generic 404 - don't reveal it's a geo block
+    return res.status(404).send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>404 Not Found</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f5f5f5;">
+        <h1 style="color: #333;">Page Not Found</h1>
+        <p style="color: #666;">The page you're looking for doesn't exist.</p>
+        <a href="/" style="color: #007bff;">Go to homepage</a>
+      </body>
+      </html>
     `);
   }
   next();
