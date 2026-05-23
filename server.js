@@ -237,26 +237,6 @@ app.use((req, res, next) => {
 });
 // ==============================================
 
-app.use((req, res, next) => {
-  if (req.path.startsWith('/secret-admin-panel') || req.path === '/health') {
-    return next();
-  }
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.socket.remoteAddress;
-  if (isVietnameseIP(ip)) {
-    return res.status(403).send(`
-      <html><head><title>Access Denied</title></head>
-      <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5;">
-        <div style="text-align: center; padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          <h1 style="color: #dc2626; margin-bottom: 1rem;">403 - Access Denied</h1>
-          <p style="color: #666;">This website is not available in your region.</p>
-        </div>
-      </body></html>
-    `);
-  }
-  next();
-});
-// ==============================================
-
 // Multer config for all uploads (images and videos)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
