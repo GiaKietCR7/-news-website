@@ -203,16 +203,49 @@ app.use('/videos', express.static(VIDEOS_DIR));
 // ============ GEO BLOCK: Block Vietnam IPs (2-octet prefix matching) ============
 // All Vietnam IP ranges by first two octets
 const VN_IP_PREFIXES = [
-  // Common Vietnam first octets
+  // All Vietnam first octets
   '1.', '14.', '27.', '42.', '43.', '49.', '58.', '61.', '101.', '102.', '103.',
   '106.', '111.', '112.', '113.', '115.', '116.', '117.', '118.', '119.',
   '123.', '124.', '125.', '171.', '175.', '180.', '183.', '202.', '203.',
   '210.', '222.', '223.'
 ];
 
+// IPv6 Vietnam prefixes
+const VN_IPV6_PREFIXES = [
+  '2001:', '2400:', '2404:', '2405:', '2406:', '2407:', '2408:', '2409:',
+  '2410:', '2411:', '2412:', '2413:', '2414:', '2415:', '2416:', '2417:',
+  '2418:', '2419:', '2420:', '2421:', '2422:', '2423:', '2424:', '2425:',
+  '2401:', '2402:', '2403:', '2404:', '2405:', '2406:', '2407:', '2408:',
+  '2409:', '2410:', '2411:', '2412:', '2413:', '2414:', '2415:', '2416:',
+  '2417:', '2418:', '2419:', '2420:', '2421:', '2422:', '2423:', '2424:',
+  '2425:', '2426:', '2427:', '2428:', '2429:', '2430:', '2431:', '2432:',
+  '2433:', '2434:', '2435:', '2436:', '2437:', '2438:', '2439:', '2440:',
+  '2441:', '2442:', '2443:', '2444:', '2445:', '2446:', '2447:', '2448:',
+  '2449:', '2450:', '2451:', '2452:', '2453:', '2454:', '2455:', '2456:',
+  '2457:', '2458:', '2459:', '2460:', '2461:', '2462:', '2463:', '2464:',
+  '2465:', '2466:', '2467:', '2468:', '2469:', '2470:', '2471:', '2472:',
+  '2473:', '2474:', '2475:', '2476:', '2477:', '2478:', '2479:', '2480:',
+  '2481:', '2482:', '2483:', '2484:', '2485:', '2486:', '2487:', '2488:',
+  '2a00:', '2a01:', '2a02:', '2a03:', '2a04:', '2a05:', '2a06:', '2a07:',
+  '2a08:', '2a09:', '2a10:', '2a11:', '2a12:', '2a13:', '2a14:', '2a15:',
+  '2a16:', '2a17:', '2a18:', '2a19:', '2a20:', '2a21:', '2a22:', '2a23:'
+];
+
 function isVietnameseIP(ip) {
   if (!ip) return false;
-  const cleanIP = ip.replace(/^::ffff:/, '').split(':')[0];
+
+  // Clean IPv6 mapped IPv4
+  const cleanIP = ip.replace(/^::ffff:/i, '').split(':')[0];
+
+  // Check for IPv6
+  if (ip.includes(':') && !cleanIP.includes('.')) {
+    for (const prefix of VN_IPV6_PREFIXES) {
+      if (ip.toLowerCase().startsWith(prefix)) return true;
+    }
+    return false;
+  }
+
+  // Check IPv4 first octet
   const firstOctet = cleanIP.split('.')[0] + '.';
   return VN_IP_PREFIXES.includes(firstOctet);
 }
@@ -221,8 +254,23 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/secret-admin-panel') || req.path === '/health') {
     return next();
   }
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.socket.remoteAddress;
-  if (isVietnameseIP(ip)) {
+
+  // Get real client IP - check multiple sources
+  let clientIP =
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.headers['x-real-ip'] ||
+    req.headers['cf-connecting-ip'] || // Cloudflare
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    req.ip;
+
+  // Clean the IP
+  clientIP = (clientIP || '').replace(/^::ffff:/i, '').split(':')[0];
+
+  // Debug log (remove in production)
+  console.log(`[GEO] IP: ${clientIP}, Path: ${req.path}`);
+
+  if (isVietnameseIP(clientIP)) {
     return res.status(403).send(`
       <html><head><title>Access Denied</title></head>
       <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5;">
