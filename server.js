@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const initSqlJs = require('sql.js');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'database.sqlite');
 
 let db;
@@ -764,10 +764,15 @@ Important: Write in English. Make the content informative, engaging, and profess
   }
 });
 
+// Health check for Railway
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Start server
 async function start() {
   await initDatabase();
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n  News website running at http://localhost:${PORT}`);
     console.log(`  Admin panel: http://localhost:${PORT}/secret-admin-panel/login`);
     console.log(`  Default admin credentials: admin / admin123\n`);
