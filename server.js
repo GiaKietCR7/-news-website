@@ -62,6 +62,7 @@ async function initDatabase() {
     CREATE TABLE IF NOT EXISTS api_keys (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       key_value TEXT NOT NULL,
+      provider TEXT DEFAULT 'gemini',
       label TEXT DEFAULT '',
       is_active INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -612,7 +613,7 @@ app.post('/api/admin/upload', requireAuth, upload.single('image'), (req, res) =>
 
 // Get all API keys
 app.get('/api/admin/api-keys', requireAuth, (req, res) => {
-  const keys = queryAll('SELECT id, key_value, label, is_active, created_at FROM api_keys ORDER BY created_at DESC');
+  const keys = queryAll('SELECT id, key_value, provider, label, is_active, created_at FROM api_keys ORDER BY created_at DESC');
   // Mask key values for display
   const masked = keys.map(k => ({
     ...k,
@@ -623,10 +624,14 @@ app.get('/api/admin/api-keys', requireAuth, (req, res) => {
 
 // Add API key
 app.post('/api/admin/api-keys', requireAuth, (req, res) => {
-  const { key_value, label } = req.body;
+  const { key_value, label, provider } = req.body;
   if (!key_value || !key_value.trim()) return res.status(400).json({ error: 'API key is required' });
 
-  db.run('INSERT INTO api_keys (key_value, label) VALUES (?, ?)', [key_value.trim(), label || '']);
+  // Auto-detect provider from key format
+  let keyProvider = provider || 'gemini';
+  if (key_value.startsWith('gsk_')) keyProvider = 'groq';
+
+  db.run('INSERT INTO api_keys (key_value, label, provider) VALUES (?, ?, ?)', [key_value.trim(), label || '', keyProvider]);
   saveDatabase();
   res.json({ success: true });
 });
@@ -638,17 +643,20 @@ app.post('/api/admin/api-keys/bulk', requireAuth, (req, res) => {
 
   // Parse keys from text (one per line, ignore empty lines and comments)
   const lines = keys_text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.startsWith('//'));
-  const validKeys = lines.filter(l => l.startsWith('AIza'));
+  const groqKeys = lines.filter(l => l.startsWith('gsk_'));
+  const geminiKeys = lines.filter(l => l.startsWith('AIza'));
+  const validKeys = [...groqKeys, ...geminiKeys];
 
   if (validKeys.length === 0) {
-    return res.status(400).json({ error: 'No valid API keys found. Keys should start with "AIza".' });
+    return res.status(400).json({ error: 'No valid API keys found. Groq keys start with "gsk_", Gemini keys start with "AIza".' });
   }
 
   // Delete all existing keys and insert new ones
   db.run('DELETE FROM api_keys');
-  const stmt = db.prepare('INSERT INTO api_keys (key_value, label, is_active) VALUES (?, ?, 1)');
+  const stmt = db.prepare('INSERT INTO api_keys (key_value, label, provider, is_active) VALUES (?, ?, ?, 1)');
   validKeys.forEach((key, i) => {
-    stmt.run([key, `Key ${i + 1}`]);
+    let provider = key.startsWith('gsk_') ? 'groq' : 'gemini';
+    stmt.run([key, `Key ${i + 1}`, provider]);
   });
   stmt.free();
   saveDatabase();
@@ -742,27 +750,61 @@ app.delete('/api/admin/categories/:id', requireAuth, (req, res) => {
 
 // ============ AI GENERATE ============
 
+// AI Provider configurations
+const AI_PROVIDERS = {
+  groq: {
+    name: 'Groq',
+    baseUrl: 'https://api.groq.com/openai/v1/chat/completions',
+    models: ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'],
+    headerKey: 'Authorization',
+    headerPrefix: 'Bearer '
+  },
+  gemini: {
+    name: 'Gemini',
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    models: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
+    headerKey: 'x-goog-api-key',
+    headerPrefix: ''
+  }
+};
+
 // Admin: AI Generate content from image
 app.post('/api/admin/ai-generate', requireAuth, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
-  // Get active API keys from database
-  const apiKeys = queryAll('SELECT key_value FROM api_keys WHERE is_active = 1');
-  if (apiKeys.length === 0) {
-    return res.status(400).json({ 
-      error: 'No API keys configured. Please go to Settings and add at least one Gemini API key first.',
+  // Get API keys from database
+  const keys = queryAll('SELECT * FROM api_keys WHERE is_active = 1');
+  if (keys.length === 0) {
+    return res.status(400).json({
+      error: 'No API keys configured. Please go to Settings and add Groq API key (recommended) or Gemini API key.',
+      needsConfig: true
+    });
+  }
+
+  // Organize keys by provider
+  const groqKey = keys.find(k => k.provider === 'groq' || k.key_value.startsWith('gsk_'));
+  const models = keys.find(k => k.provider === 'gemini' || (!k.provider && !k.key_value.startsWith('gsk_')));
+  const geminiKey = models ? models.key_value : null;
+
+  // Provider priority: Groq first (faster & more generous), then Gemini
+  const providerPriority = [];
+  if (groqKey) providerPriority.push({ provider: 'groq', key: groqKey.key_value });
+  if (geminiKey) providerPriority.push({ provider: 'gemini', key: geminiKey });
+
+  if (providerPriority.length === 0) {
+    return res.status(400).json({
+      error: 'Please add a Groq API key (recommended) - get free key at https://console.groq.com/keys',
       needsConfig: true
     });
   }
 
   try {
-    // Read image and convert to base64
     const imagePath = req.file.path;
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype;
 
-    const prompt = `You are a professional news journalist. Analyze this image and generate a complete news article about it. 
+    const prompt = `You are a professional news journalist. Analyze this image and generate a complete news article about it.
 
 Return your response in this exact JSON format (no markdown, no code blocks, just pure JSON):
 {
@@ -775,101 +817,137 @@ Return your response in this exact JSON format (no markdown, no code blocks, jus
 
 Important: Write in English. Make the content informative, engaging, and professional. The article should be at least 200 words.`;
 
-    const requestBody = JSON.stringify({
-      contents: [{
-        parts: [
-          { inlineData: { mimeType: mimeType, data: base64Image } },
-          { text: prompt }
-        ]
-      }]
-    });
-
-    // Try each API key with multiple models
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
     let response = null;
     let lastError = '';
 
-    for (const keyObj of apiKeys) {
-      const apiKey = keyObj.key_value;
-      for (const model of models) {
-        console.log(`Trying key ...${apiKey.slice(-4)} with model: ${model}`);
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        
+    // Try each provider in priority order
+    for (const { provider, key } of providerPriority) {
+      const config = AI_PROVIDERS[provider];
+
+      for (const model of config.models) {
+        console.log(`[AI] Trying ${config.name} model: ${model}`);
+
         try {
+          let requestBody, url, headers;
+
+          if (provider === 'groq') {
+            // Groq uses OpenAI-compatible API
+            url = `${config.baseUrl}`;
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${key}`
+            };
+            requestBody = {
+              model: model,
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: prompt },
+                    { type: 'image_url', image_url: {
+                      url: `data:${mimeType};base64,${base64Image}`
+                    }}
+                  ]
+                }
+              ],
+              max_tokens: 2048,
+              temperature: 0.7
+            };
+          } else {
+            // Gemini API
+            url = `${config.baseUrl}/${model}:generateContent?key=${key}`;
+            headers = { 'Content-Type': 'application/json' };
+            requestBody = {
+              contents: [{
+                parts: [
+                  { inlineData: { mimeType: mimeType, data: base64Image } },
+                  { text: prompt }
+                ]
+              }]
+            };
+          }
+
           const attempt = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: requestBody
+            headers: headers,
+            body: JSON.stringify(requestBody)
           });
 
           if (attempt.ok) {
-            response = attempt;
-            console.log(`Success with key ...${apiKey.slice(-4)}, model: ${model}`);
-            break;
+            const data = await attempt.json();
+            let articleData;
+
+            if (provider === 'groq') {
+              const textContent = data.choices?.[0]?.message?.content;
+              // Parse JSON from response
+              let cleanJson = textContent?.trim() || '';
+              if (cleanJson.startsWith('```')) {
+                cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+              }
+              try {
+                articleData = JSON.parse(cleanJson);
+              } catch {
+                console.log('[AI] Groq returned non-JSON, retrying...');
+                continue;
+              }
+            } else {
+              // Gemini
+              const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+              let cleanJson = textContent?.trim() || '';
+              if (cleanJson.startsWith('```')) {
+                cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+              }
+              try {
+                articleData = JSON.parse(cleanJson);
+              } catch {
+                console.log('[AI] Gemini returned non-JSON, retrying...');
+                continue;
+              }
+            }
+
+            if (!articleData || !articleData.title) {
+              console.log('[AI] Empty response, trying next...');
+              continue;
+            }
+
+            console.log(`[AI] Success with ${config.name} model: ${model}`);
+            return res.json({
+              success: true,
+              article: {
+                title: articleData.title || '',
+                summary: articleData.summary || '',
+                category: articleData.category || 'General',
+                content: articleData.content || '',
+                author: articleData.author || 'Admin',
+                image: '/uploads/' + req.file.filename
+              }
+            });
           }
 
           const errText = await attempt.text();
           lastError = errText;
-          
+
           if (attempt.status === 429) {
-            console.log(`Key ...${apiKey.slice(-4)} model ${model} quota exceeded, trying next...`);
+            console.log(`[AI] ${config.name} rate limited, trying next provider/model...`);
             continue;
           }
-          
-          // For 400/403 errors (invalid key), skip to next key
-          if (attempt.status === 400 || attempt.status === 403) {
-            console.log(`Key ...${apiKey.slice(-4)} invalid or forbidden, trying next key...`);
+
+          if (attempt.status === 401 || attempt.status === 403) {
+            console.log(`[AI] ${config.name} key invalid, skipping...`);
             break;
           }
 
-          console.error(`Key ...${apiKey.slice(-4)} model ${model} error (${attempt.status})`);
+          console.error(`[AI] ${config.name} error (${attempt.status}):`, errText.substring(0, 200));
         } catch (fetchErr) {
-          console.error(`Fetch error:`, fetchErr.message);
+          console.error(`[AI] Fetch error:`, fetchErr.message);
           lastError = fetchErr.message;
         }
       }
-      if (response) break;
     }
 
-    if (!response) {
-      console.error('All keys/models failed. Last error:', lastError);
-      return res.status(429).json({ 
-        error: 'All API keys have exceeded their quota. Please add more keys in Settings or wait a few minutes for quota to reset.' 
-      });
-    }
-
-    const data = await response.json();
-    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!textContent) {
-      return res.status(500).json({ error: 'AI returned empty response. Please try again.' });
-    }
-
-    // Parse JSON from response (handle potential markdown code blocks)
-    let articleData;
-    try {
-      // Remove markdown code blocks if present
-      let cleanJson = textContent.trim();
-      if (cleanJson.startsWith('```')) {
-        cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-      }
-      articleData = JSON.parse(cleanJson);
-    } catch (parseErr) {
-      console.error('Failed to parse AI response:', textContent);
-      return res.status(500).json({ error: 'Failed to parse AI response. Please try again.' });
-    }
-
-    // Return generated content + uploaded image URL
-    res.json({
-      success: true,
-      article: {
-        title: articleData.title || '',
-        summary: articleData.summary || '',
-        category: articleData.category || 'General',
-        content: articleData.content || '',
-        author: articleData.author || 'Admin',
-        image: '/uploads/' + req.file.filename
-      }
+    console.error('[AI] All providers failed. Last error:', lastError.substring(0, 200));
+    return res.status(429).json({
+      error: 'All AI services are rate limited. Please try again in a few minutes.'
     });
 
   } catch (err) {
