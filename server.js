@@ -69,6 +69,14 @@ async function initDatabase() {
     )
   `);
 
+  // Migration: Add provider column if it doesn't exist
+  try {
+    db.run('ALTER TABLE api_keys ADD COLUMN provider TEXT DEFAULT "gemini"');
+    console.log('[DB] Migration: Added provider column to api_keys');
+  } catch (e) {
+    // Column might already exist, that's fine
+  }
+
   db.run(`
     CREATE TABLE IF NOT EXISTS categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -781,15 +789,14 @@ app.post('/api/admin/ai-generate', requireAuth, upload.single('image'), async (r
     });
   }
 
-  // Organize keys by provider
-  const groqKey = keys.find(k => k.provider === 'groq' || k.key_value.startsWith('gsk_'));
-  const models = keys.find(k => k.provider === 'gemini' || (!k.provider && !k.key_value.startsWith('gsk_')));
-  const geminiKey = models ? models.key_value : null;
+  // Organize keys by provider (Groq keys start with 'gsk_')
+  const groqKeys = keys.filter(k => k.key_value.startsWith('gsk_'));
+  const geminiKeys = keys.filter(k => !k.key_value.startsWith('gsk_'));
 
   // Provider priority: Groq first (faster & more generous), then Gemini
   const providerPriority = [];
-  if (groqKey) providerPriority.push({ provider: 'groq', key: groqKey.key_value });
-  if (geminiKey) providerPriority.push({ provider: 'gemini', key: geminiKey });
+  if (groqKeys.length > 0) providerPriority.push({ provider: 'groq', key: groqKeys[0].key_value });
+  if (geminiKeys.length > 0) providerPriority.push({ provider: 'gemini', key: geminiKeys[0].key_value });
 
   if (providerPriority.length === 0) {
     return res.status(400).json({
