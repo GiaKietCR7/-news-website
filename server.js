@@ -607,28 +607,57 @@ app.post('/api/admin/articles', requireAuth, upload.fields([{ name: 'image', max
 
 // Admin: Update article
 app.put('/api/admin/articles/:id', requireAuth, upload.fields([{ name: 'image', maxCount: 10 }, { name: 'video', maxCount: 1 }]), (req, res) => {
-  const { title, summary, content, category, author } = req.body;
+  const { title, summary, content, category, author, existing_image, existing_video, created_at, delete_images } = req.body;
   const article = queryOne('SELECT * FROM articles WHERE id = ?', [parseInt(req.params.id)]);
 
   if (!article) return res.status(404).json({ error: 'Article not found' });
 
-  const featuredImage = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : article.image;
-  const video = req.files?.['video']?.[0] ? '/videos/' + req.files['video'][0].filename : (req.body.existing_video !== undefined ? req.body.existing_video : article.video);
+  // Handle featured image - keep existing if no new image uploaded
+  let featuredImage = article.image;
+  if (req.files?.['image']?.[0]) {
+    featuredImage = '/uploads/' + req.files['image'][0].filename;
+  } else if (existing_image !== undefined) {
+    featuredImage = existing_image || null;
+  }
 
-  db.run(
-    'UPDATE articles SET title = ?, summary = ?, content = ?, category = ?, image = ?, video = ?, author = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [title, summary, content, category, featuredImage, video, author, parseInt(req.params.id)]
-  );
+  // Handle video
+  let video = article.video;
+  if (req.files?.['video']?.[0]) {
+    video = '/videos/' + req.files['video'][0].filename;
+  } else if (req.body.existing_video !== undefined) {
+    video = req.body.existing_video || null;
+  }
+
+  // Build update query
+  let query = 'UPDATE articles SET title = ?, summary = ?, content = ?, category = ?, image = ?, video = ?, author = ?, updated_at = CURRENT_TIMESTAMP';
+  let params = [title, summary, content, category, featuredImage, video, author];
+
+  // Handle created_at update
+  if (created_at) {
+    query += ', created_at = ?';
+    params.push(created_at);
+  }
+
+  query += ' WHERE id = ?';
+  params.push(parseInt(req.params.id));
+
+  db.run(query, params);
   saveDatabase();
 
-  // Update additional images
-  if (req.files?.['image']) {
-    // Delete existing extra images
-    db.run('DELETE FROM article_images WHERE article_id = ? AND is_featured = 0', [parseInt(req.params.id)]);
-    // Insert new ones
+  // Handle image deletion
+  if (delete_images) {
+    const toDelete = delete_images.split(',').filter(id => id).map(id => parseInt(id));
+    if (toDelete.length > 0) {
+      db.run(`DELETE FROM article_images WHERE id IN (${toDelete.map(() => '?').join(',')})`, toDelete);
+      saveDatabase();
+    }
+  }
+
+  // Handle new images (skip first as it's featured)
+  if (req.files?.['image'] && req.files['image'].length > 1) {
     const stmt = db.prepare('INSERT INTO article_images (article_id, image_url, sort_order, is_featured) VALUES (?, ?, ?, 0)');
     req.files['image'].forEach((file, index) => {
-      if (index > 0) { // Skip first, it's the featured image
+      if (index > 0) {
         stmt.run([parseInt(req.params.id), '/uploads/' + file.filename, index]);
       }
     });

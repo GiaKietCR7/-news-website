@@ -377,6 +377,7 @@
             document.getElementById('image-gallery').innerHTML = '';
             selectedImages = [];
             selectedImageUrls = [];
+            window.deletedExtraImageIds = [];
         }
 
         // Edit existing article
@@ -393,6 +394,12 @@
                 document.getElementById('edit-author').value = article.author;
                 document.getElementById('edit-summary').value = article.summary || '';
                 document.getElementById('edit-content').value = article.content;
+                // Load created_at date
+                if (article.created_at) {
+                    const dateInput = document.getElementById('edit-date');
+                    const date = new Date(article.created_at);
+                    dateInput.value = date.toISOString().slice(0, 16);
+                }
                 document.getElementById('editor-error').classList.add('hidden');
 
                 if (article.image) {
@@ -409,17 +416,18 @@
                 gallery.innerHTML = '';
                 selectedImages = [];
                 selectedImageUrls = [];
+                window.deletedExtraImageIds = []; // Track deleted extra images
+
                 if (article.extra_images && article.extra_images.length > 0) {
                     article.extra_images.forEach((img, index) => {
                         const div = document.createElement('div');
                         div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200';
+                        div.id = 'extra-img-' + img.id;
                         div.innerHTML = `
                             <img src="${img.image_url}" class="w-full h-full object-cover">
                             <button type="button" onclick="removeExistingImage(${img.id})" class="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center">×</button>
                         `;
                         gallery.appendChild(div);
-                        // Mark for deletion update
-                        img.toDelete = false;
                     });
                 }
 
@@ -562,6 +570,14 @@
             return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
         }
 
+        // Remove existing extra image (mark for deletion)
+        function removeExistingImage(imgId) {
+            if (!window.deletedExtraImageIds) window.deletedExtraImageIds = [];
+            window.deletedExtraImageIds.push(imgId);
+            const el = document.getElementById('extra-img-' + imgId);
+            if (el) el.remove();
+        }
+
         // Submit article form with progress indicator
         document.getElementById('article-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -590,12 +606,13 @@
 
             const imageFile = document.getElementById('edit-image').files[0];
 
-            // Handle multiple images
+            // Handle images for edit mode - send existing_image only when intentionally keeping it
             const existingImage = document.getElementById('edit-existing-image').value;
-            if (existingImage) {
+            // Send existing_image if there's a value and no new images selected
+            if (existingImage && selectedImages.length === 0 && !imageFile) {
                 formData.append('existing_image', existingImage);
             }
-            // Append multiple image files
+            // Append multiple image files (new selections)
             if (selectedImages.length > 0) {
                 selectedImages.forEach(file => {
                     formData.append('image', file);
@@ -618,6 +635,11 @@
             const customDate = document.getElementById('edit-date').value;
             if (customDate) {
                 formData.append('created_at', customDate);
+            }
+
+            // Send deleted image IDs (for edit mode)
+            if (id && window.deletedExtraImageIds && window.deletedExtraImageIds.length > 0) {
+                formData.append('delete_images', window.deletedExtraImageIds.join(','));
             }
 
             // Show progress bar
