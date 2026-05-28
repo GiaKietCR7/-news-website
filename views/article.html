@@ -277,7 +277,19 @@
                 // Insert featured image and video before content
                 let contentHtml = '';
                 if (article.image) {
-                    contentHtml += `<img src="${article.image}" alt="${article.title}" class="w-full rounded-2xl shadow-lg mb-8">`;
+                    contentHtml += `<div class="rounded-2xl shadow-lg mb-8 overflow-hidden">
+                        <img src="${article.image}" alt="${article.title}" class="w-full">
+                    </div>`;
+                }
+                // Image gallery (extra images)
+                if (article.extra_images && article.extra_images.length > 0) {
+                    contentHtml += `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">`;
+                    article.extra_images.forEach(img => {
+                        contentHtml += `<div class="rounded-xl overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition" onclick="openLightbox('${img.image_url}')">
+                            <img src="${img.image_url}" alt="${article.title}" class="w-full h-40 object-cover">
+                        </div>`;
+                    });
+                    contentHtml += `</div>`;
                 }
                 if (article.video) {
                     contentHtml += `<video controls class="w-full rounded-2xl shadow-lg mb-8" style="max-height: 500px;">
@@ -387,6 +399,19 @@
                 document.head.appendChild(el);
             }
             el.setAttribute('content', content);
+        }
+
+        // Lightbox for gallery images
+        function openLightbox(src) {
+            const lightbox = document.createElement('div');
+            lightbox.id = 'lightbox';
+            lightbox.className = 'fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4';
+            lightbox.innerHTML = `
+                <button onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300">&times;</button>
+                <img src="${src}" class="max-w-full max-h-full rounded-lg">
+            `;
+            lightbox.onclick = function(e) { if (e.target === this) this.remove(); };
+            document.body.appendChild(lightbox);
         }
 
         // Helpers

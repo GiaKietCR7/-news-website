@@ -59,6 +59,18 @@ async function initDatabase() {
   `);
 
   db.run(`
+    CREATE TABLE IF NOT EXISTS article_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      article_id INTEGER NOT NULL,
+      image_url TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 0,
+      is_featured INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+    )
+  `);
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS api_keys (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       key_value TEXT NOT NULL,
@@ -493,6 +505,13 @@ app.get('/api/articles/:idOrSlug', (req, res) => {
   db.run('UPDATE articles SET views = views + 1 WHERE id = ?', [article.id]);
   saveDatabase();
 
+  // Get all images for this article
+  const extraImages = queryAll(
+    'SELECT id, image_url, sort_order FROM article_images WHERE article_id = ? ORDER BY sort_order',
+    [article.id]
+  );
+  article.extra_images = extraImages;
+
   // Attach avatar and fake views
   const journalist = getJournalistByName(article.author) || JOURNALIST_AVATARS[article.id % JOURNALIST_AVATARS.length];
   article.author_avatar = journalist.avatar;
@@ -556,39 +575,66 @@ app.post('/api/admin/logout', (req, res) => {
 });
 
 // Admin: Create article (new articles are hidden by default - must manually show)
-app.post('/api/admin/articles', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), (req, res) => {
+app.post('/api/admin/articles', requireAuth, upload.fields([{ name: 'image', maxCount: 10 }, { name: 'video', maxCount: 1 }]), (req, res) => {
   const { title, summary, content, category, author, existing_image, existing_video, created_at } = req.body;
-  const image = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : (existing_image || null);
+  const featuredImage = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : (existing_image || null);
   const video = req.files?.['video']?.[0] ? '/videos/' + req.files['video'][0].filename : (existing_video || null);
   const publishDate = created_at || new Date().toISOString();
   const slug = generateSlug(title);
 
   db.run(
     'INSERT INTO articles (title, summary, content, category, image, video, author, created_at, slug, is_hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
-    [title, summary, content, category || 'General', image, video, author || 'Admin', publishDate, slug]
+    [title, summary, content, category || 'General', featuredImage, video, author || 'Admin', publishDate, slug]
   );
   saveDatabase();
 
   const result = db.exec('SELECT last_insert_rowid() as id');
   const id = result[0].values[0][0];
+
+  // Save additional images to article_images table
+  if (req.files?.['image']?.length > 1) {
+    const stmt = db.prepare('INSERT INTO article_images (article_id, image_url, sort_order, is_featured) VALUES (?, ?, ?, ?)');
+    req.files['image'].forEach((file, index) => {
+      const isFeatured = index === 0 ? 1 : 0; // First image is featured
+      stmt.run([id, '/uploads/' + file.filename, index, isFeatured]);
+    });
+    stmt.free();
+    saveDatabase();
+  }
+
   res.json({ success: true, id, slug });
 });
 
 // Admin: Update article
-app.put('/api/admin/articles/:id', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), (req, res) => {
+app.put('/api/admin/articles/:id', requireAuth, upload.fields([{ name: 'image', maxCount: 10 }, { name: 'video', maxCount: 1 }]), (req, res) => {
   const { title, summary, content, category, author } = req.body;
   const article = queryOne('SELECT * FROM articles WHERE id = ?', [parseInt(req.params.id)]);
 
   if (!article) return res.status(404).json({ error: 'Article not found' });
 
-  const image = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : article.image;
+  const featuredImage = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : article.image;
   const video = req.files?.['video']?.[0] ? '/videos/' + req.files['video'][0].filename : (req.body.existing_video !== undefined ? req.body.existing_video : article.video);
 
   db.run(
     'UPDATE articles SET title = ?, summary = ?, content = ?, category = ?, image = ?, video = ?, author = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [title, summary, content, category, image, video, author, parseInt(req.params.id)]
+    [title, summary, content, category, featuredImage, video, author, parseInt(req.params.id)]
   );
   saveDatabase();
+
+  // Update additional images
+  if (req.files?.['image']) {
+    // Delete existing extra images
+    db.run('DELETE FROM article_images WHERE article_id = ? AND is_featured = 0', [parseInt(req.params.id)]);
+    // Insert new ones
+    const stmt = db.prepare('INSERT INTO article_images (article_id, image_url, sort_order, is_featured) VALUES (?, ?, ?, 0)');
+    req.files['image'].forEach((file, index) => {
+      if (index > 0) { // Skip first, it's the featured image
+        stmt.run([parseInt(req.params.id), '/uploads/' + file.filename, index]);
+      }
+    });
+    stmt.free();
+    saveDatabase();
+  }
 
   res.json({ success: true });
 });

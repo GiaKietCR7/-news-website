@@ -1,0 +1,742 @@
+[
+  {
+    "host_key": ".google.com",
+    "name": "AEC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437977599366544,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425599366544
+  },
+  {
+    "host_key": "chromewebstore.google.com",
+    "name": "OTZ",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13425017602000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425602275948
+  },
+  {
+    "host_key": ".google.com",
+    "name": "__Secure-BUCKET",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437977599366648,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425599366648
+  },
+  {
+    "host_key": ".chromewebstore.google.com",
+    "name": "_ga",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985601348900,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425601348952
+  },
+  {
+    "host_key": ".chromewebstore.google.com",
+    "name": "_ga_KHZNC1Q6K0",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985604886236,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425604886264
+  },
+  {
+    "host_key": ".youtube.com",
+    "name": "VISITOR_INFO1_LIVE",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437977600952944,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425600952944
+  },
+  {
+    "host_key": ".youtube.com",
+    "name": "VISITOR_PRIVACY_METADATA",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437977600952988,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425600952988
+  },
+  {
+    "host_key": ".youtube.com",
+    "name": "__Secure-ROLLOUT_TOKEN",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437977600952848,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425600952848
+  },
+  {
+    "host_key": "www.google.com",
+    "name": "DV",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422426297000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425697282002
+  },
+  {
+    "host_key": ".ip8.com",
+    "name": "FCCDCF",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456121715000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425715831628
+  },
+  {
+    "host_key": ".google.com",
+    "name": "SNID",
+    "value": "",
+    "path": "/verify",
+    "expires_utc": 13438236785828124,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425696828124
+  },
+  {
+    "host_key": ".ip8.com",
+    "name": "_ga",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985713162746,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425713162768
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "datr",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985697702748,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425697702748
+  },
+  {
+    "host_key": ".kineticharbor.com",
+    "name": "__gsas",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456121754000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425756121260
+  },
+  {
+    "host_key": ".hotnmail.com",
+    "name": "_cq_duid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430309750000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425750861498
+  },
+  {
+    "host_key": ".kineticharbor.com",
+    "name": "_cq_duid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430309756000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425756841232
+  },
+  {
+    "host_key": ".hotnmail.com",
+    "name": "_cq_session",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985750862330,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425750862356
+  },
+  {
+    "host_key": ".kineticharbor.com",
+    "name": "_cq_session",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456985756841900,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425756841928
+  },
+  {
+    "host_key": "obseu.buzzfighter.com",
+    "name": "cg_uuid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13451456158033202,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425758033202
+  },
+  {
+    "host_key": "obseu.northwavepoint.com",
+    "name": "cg_uuid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13451456151908240,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425751908240
+  },
+  {
+    "host_key": "kineticharbor.com",
+    "name": "experimentId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422512151566496,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425752566496
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "locale",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13423030531229132,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425731229132
+  },
+  {
+    "host_key": "kineticharbor.com",
+    "name": "templateId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422512151566596,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425752566596
+  },
+  {
+    "host_key": "kineticharbor.com",
+    "name": "templateOptimizationRequestId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422512151566580,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425752566580
+  },
+  {
+    "host_key": "kineticharbor.com",
+    "name": "variationId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422512151566560,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422425752566560
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "ClientId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453961776515626,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425776515626
+  },
+  {
+    "host_key": "support.microsoft.com",
+    "name": "EXPID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453961780984378,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425765902356
+  },
+  {
+    "host_key": ".microsoft.com",
+    "name": "MC1",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453961776888088,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425775888088
+  },
+  {
+    "host_key": "support.microsoft.com",
+    "name": "MSFPC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453961779252632,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425779252676
+  },
+  {
+    "host_key": "support.microsoft.com",
+    "name": "MicrosoftApplicationsTelemetryDeviceId",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453961781387710,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425781387744
+  },
+  {
+    "host_key": ".google.com",
+    "name": "NID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13438236965323526,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425765323526
+  },
+  {
+    "host_key": ".google.com",
+    "name": "SOCS",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456553764611176,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425763598814
+  },
+  {
+    "host_key": ".login.microsoftonline.com",
+    "name": "brcap",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456121787000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425787972994
+  },
+  {
+    "host_key": "login.microsoftonline.com",
+    "name": "buid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13425017785687452,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425784687452
+  },
+  {
+    "host_key": ".login.live.com",
+    "name": "MSCC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456121873629960,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425872629960
+  },
+  {
+    "host_key": "login.microsoftonline.com",
+    "name": "fpc",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13425017871108252,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425784687748
+  },
+  {
+    "host_key": ".live.com",
+    "name": "mkt",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453948802054304,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425885054092
+  },
+  {
+    "host_key": "account.live.com",
+    "name": "clrc",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13425017984000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425984231032
+  },
+  {
+    "host_key": ".live.com",
+    "name": "ANON",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13439734813413476,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013412892
+  },
+  {
+    "host_key": ".login.live.com",
+    "name": "JSHP",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413692,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426013413032
+  },
+  {
+    "host_key": ".live.com",
+    "name": "MSPAuth",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413320,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013412796
+  },
+  {
+    "host_key": ".login.live.com",
+    "name": "MSPCID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413268,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425990137726
+  },
+  {
+    "host_key": ".live.com",
+    "name": "MSPProf",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413372,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013412826
+  },
+  {
+    "host_key": ".live.com",
+    "name": "NAP",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13431091213413420,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013412856
+  },
+  {
+    "host_key": ".live.com",
+    "name": "PPLState",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413204,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425881888242
+  },
+  {
+    "host_key": ".login.live.com",
+    "name": "SDIDC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413622,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013413622
+  },
+  {
+    "host_key": ".live.com",
+    "name": "WLSSC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413552,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013412944
+  },
+  {
+    "host_key": "login.live.com",
+    "name": "__Host-MSAAUTHP",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122013413144,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426013413144
+  },
+  {
+    "host_key": "login.microsoft.com",
+    "name": "fpc",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13425017993115104,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425992115104
+  },
+  {
+    "host_key": ".bing.com",
+    "name": "ANON",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437978051470278,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050466524
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "DefaultAnchorMailbox",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13422512430000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426016495142
+  },
+  {
+    "host_key": ".c.bing.com",
+    "name": "MR",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13423030851470504,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050466706
+  },
+  {
+    "host_key": ".c.live.com",
+    "name": "MR",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13423030850835586,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050776140
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "MSFPC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453962040852272,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426021850348
+  },
+  {
+    "host_key": ".bing.com",
+    "name": "MUID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122051470466,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050470466
+  },
+  {
+    "host_key": ".live.com",
+    "name": "MUID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122050835466,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050835466
+  },
+  {
+    "host_key": ".bing.com",
+    "name": "NAP",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437978051470428,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050466656
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "OptInH",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430202038739092,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426037739016
+  },
+  {
+    "host_key": ".c.bing.com",
+    "name": "SRA_B",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437978051470344,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050466600
+  },
+  {
+    "host_key": ".c.bing.com",
+    "name": "SRA_L",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13437978051470392,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050466632
+  },
+  {
+    "host_key": ".c.bing.com",
+    "name": "SRM_B",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122051470544,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050470544
+  },
+  {
+    "host_key": ".c.bing.com",
+    "name": "SRM_L",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122051470580,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050470580
+  },
+  {
+    "host_key": ".c.live.com",
+    "name": "SRM_L",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456122050835542,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426050835542
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "c_user",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453962061756874,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426061121738
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "icu",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430202055618904,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426055618904
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "sb",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456986061121878,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422425698010552
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "xs",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13453962061756960,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426061756960
+  },
+  {
+    "host_key": ".ip8.com",
+    "name": "_ga_KGGP201HGL",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13456986219364226,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422426219364246
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "fr",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430202247087208,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426247087208
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "uuid2",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430202345366252,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13422426055082064
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "XANDR_PANID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430202345366148,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422426055618810
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "MicrosoftApplicationsTelemetryDeviceId",
+    "value": "",
+    "path": "/mail",
+    "expires_utc": 13453963339000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422427339047562
+  },
+  {
+    "host_key": "outlook.live.com",
+    "name": "MicrosoftApplicationsTelemetryFirstLaunchTime",
+    "value": "",
+    "path": "/mail",
+    "expires_utc": 13453963339000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13422427339047690
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "wd",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13423052543000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13422425708115738
+  }
+]

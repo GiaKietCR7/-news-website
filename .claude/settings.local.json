@@ -15,7 +15,11 @@
       "Bash(npm uninstall *)",
       "Bash(npm install *)",
       "Bash(npm --version)",
-      "Bash(railway up *)"
+      "Bash(railway up *)",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"D:\\\\shopify-upgrade\\\\carpoints-upgraded-theme.zip\"\\); $zip.Entries | Where-Object { $_.Name -eq \"theme.liquid\" -or $_.Name -eq \"main-product.liquid\" } | Select-Object FullName; $zip.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"D:\\\\shopify-upgrade\\\\carpoints-upgraded-theme.zip\"\\); $zip.Entries | Select-Object -First 20 FullName; $zip.Dispose\\(\\))",
+      "Bash(zip -r \"../carpoints-upgraded-theme.zip\" .)",
+      "Read(//d//**)"
     ]
   }
 }

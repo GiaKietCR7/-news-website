@@ -1,0 +1,542 @@
+[
+  {
+    "host_key": ".youtube.com",
+    "name": "VISITOR_INFO1_LIVE",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356266633688,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804266633688
+  },
+  {
+    "host_key": ".youtube.com",
+    "name": "VISITOR_PRIVACY_METADATA",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356266633720,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804266633720
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "__eoi",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356474000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804475159788
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "__gads",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13432500474000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804475159620
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "__gpi",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13432500474000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804475159724
+  },
+  {
+    "host_key": ".youtube.com",
+    "name": "__Secure-ROLLOUT_TOKEN",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356469668054,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804469668054
+  },
+  {
+    "host_key": ".adkernel.com",
+    "name": "ADKUID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13401396484505580,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484505580
+  },
+  {
+    "host_key": ".adkernel.com",
+    "name": "ADK_EX_11",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13400014084505512,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484505512
+  },
+  {
+    "host_key": ".tribalfusion.com",
+    "name": "ANON_ID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580485370586,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804483370586
+  },
+  {
+    "host_key": ".casalemedia.com",
+    "name": "CMID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340478751184,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804477745740
+  },
+  {
+    "host_key": ".casalemedia.com",
+    "name": "CMPRO",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580478751262,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804477745852
+  },
+  {
+    "host_key": ".casalemedia.com",
+    "name": "CMPS",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580477745814,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804477745814
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "FCNEC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340482000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13398804482442178
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "anj",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580478836552,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804478836552
+  },
+  {
+    "host_key": ".googleadservices.com",
+    "name": "ar_debug",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580482445936,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804482445936
+  },
+  {
+    "host_key": ".linkedin.com",
+    "name": "bcookie",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340485998528,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484998528
+  },
+  {
+    "host_key": ".mfadsrvr.com",
+    "name": "c",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340484489232,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484489232
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "compte",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13429908479446608,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13398804478910726
+  },
+  {
+    "host_key": ".linkedin.com",
+    "name": "lidc",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13398890885998596,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484998596
+  },
+  {
+    "host_key": ".mfadsrvr.com",
+    "name": "ssh",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340484847056,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484847056
+  },
+  {
+    "host_key": ".simpli.fi",
+    "name": "suid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430426883406320,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804483406320
+  },
+  {
+    "host_key": ".teads.tv",
+    "name": "tt_viewer",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430254084434404,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484434404
+  },
+  {
+    "host_key": ".mfadsrvr.com",
+    "name": "tuuid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340484846930,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484489158
+  },
+  {
+    "host_key": ".mfadsrvr.com",
+    "name": "tuuid_lu",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430340484847016,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804484847016
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "uuid2",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580478836592,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804477990566
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "yc",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13429908480100756,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13398804468965484
+  },
+  {
+    "host_key": ".yopmail.com",
+    "name": "ywm",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13429908479446650,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13398804478910754
+  },
+  {
+    "host_key": ".doubleclick.net",
+    "name": "APC",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356477557684,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804477557684
+  },
+  {
+    "host_key": ".adnxs.com",
+    "name": "XANDR_PANID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13406580478836428,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398804477990452
+  },
+  {
+    "host_key": ".doubleclick.net",
+    "name": "receive-cookie-deprecation",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13414356478237804,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804477557768
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "ps_l",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13433365248050364,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398805248050364
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "ps_n",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13433365248050512,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398805248050512
+  },
+  {
+    "host_key": "paywithmybank.com",
+    "name": "fp_token_7c6a6574-f011-4c9a-abdd-9894a102ccef",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430463908901612,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398800567606912
+  },
+  {
+    "host_key": "mpsnare.iesnare.com",
+    "name": "io_token_7c6a6574-f011-4c9a-abdd-9894a102ccef",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430463910540672,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398800568353264
+  },
+  {
+    "host_key": ".barclays.co.uk",
+    "name": "bmuid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430463932000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398927932002442
+  },
+  {
+    "host_key": ".barclays.co.uk",
+    "name": "cdSNum",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13398931534000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398927934222592
+  },
+  {
+    "host_key": "bank.barclays.co.uk",
+    "name": "olbvisitor",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13433487924656144,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398927924656144
+  },
+  {
+    "host_key": "bank.barclays.co.uk",
+    "name": "site-id",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13398928823941644,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398927923941644
+  },
+  {
+    "host_key": "bank.barclays.co.uk",
+    "name": "sroo",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430463923941790,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13398927923941790
+  },
+  {
+    "host_key": ".barclays.co.uk",
+    "name": "utag_main",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13430463934000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13398927934277516
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "datr",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434978417339396,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13400418417339396
+  },
+  {
+    "host_key": ".2fa.live",
+    "name": "_gcl_au",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13408194444000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13400418444455912
+  },
+  {
+    "host_key": ".doubleclick.net",
+    "name": "IDE",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434978444993244,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13400418444993244
+  },
+  {
+    "host_key": ".2fa.live",
+    "name": "_ga",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434978444984328,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13400418444984390
+  },
+  {
+    "host_key": ".2fa.live",
+    "name": "_gat_gtag_UA_78777107_1",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13400418504000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13400418444988090
+  },
+  {
+    "host_key": ".2fa.live",
+    "name": "_gid",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13400504844000000,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13400418444985212
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "sb",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434978453724912,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13398804379772952
+  },
+  {
+    "host_key": ".2fa.live",
+    "name": "_ga_R2SB88WPTD",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434978470851112,
+    "is_secure": 0,
+    "is_httponly": 0,
+    "creation_utc": 13400418470851136
+  },
+  {
+    "host_key": ".google.com",
+    "name": "NID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434046144999064,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13418255931999064
+  },
+  {
+    "host_key": ".lensfrontend-pa.googleapis.com",
+    "name": "NID",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13434046139034872,
+    "is_secure": 0,
+    "is_httponly": 1,
+    "creation_utc": 13418255932034872
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "c_user",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13449791934835376,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13400418453724744
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "fr",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13426031934835500,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13418255934835500
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "wd",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13418860737000000,
+    "is_secure": 1,
+    "is_httponly": 0,
+    "creation_utc": 13418255937522276
+  },
+  {
+    "host_key": ".facebook.com",
+    "name": "xs",
+    "value": "",
+    "path": "/",
+    "expires_utc": 13449791934835576,
+    "is_secure": 1,
+    "is_httponly": 1,
+    "creation_utc": 13418255934835576
+  }
+]
