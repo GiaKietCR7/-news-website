@@ -763,16 +763,14 @@ const AI_PROVIDERS = {
   groq: {
     name: 'Groq',
     baseUrl: 'https://api.groq.com/openai/v1/chat/completions',
-    models: ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'],
-    headerKey: 'Authorization',
-    headerPrefix: 'Bearer '
+    models: ['llama-3.3-70b-versatile'],
+    supportsVision: false // Groq doesn't support image input well yet
   },
   gemini: {
     name: 'Gemini',
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
     models: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
-    headerKey: 'x-goog-api-key',
-    headerPrefix: ''
+    supportsVision: true
   }
 };
 
@@ -838,7 +836,7 @@ Important: Write in English. Make the content informative, engaging, and profess
           let requestBody, url, headers;
 
           if (provider === 'groq') {
-            // Groq uses OpenAI-compatible API
+            // Groq uses OpenAI-compatible API - content must be array of parts
             url = `${config.baseUrl}`;
             headers = {
               'Content-Type': 'application/json',
