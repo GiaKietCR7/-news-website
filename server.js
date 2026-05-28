@@ -6,6 +6,7 @@ const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const initSqlJs = require('sql.js');
+const geoip = require('geoip-lite');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -93,6 +94,11 @@ async function initDatabase() {
     db.run('ALTER TABLE articles ADD COLUMN video TEXT DEFAULT NULL');
   } catch(e) { /* column already exists */ }
 
+  // Add is_hidden column to articles if not exists
+  try {
+    db.run('ALTER TABLE articles ADD COLUMN is_hidden INTEGER DEFAULT 0');
+  } catch(e) { /* column already exists */ }
+
   // Insert default categories if empty
   const catCount = db.exec("SELECT COUNT(*) FROM categories");
   if (catCount[0].values[0][0] === 0) {
@@ -117,6 +123,9 @@ async function initDatabase() {
     const hashedPassword = bcrypt.hashSync('admin123', 10);
     db.run("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ['admin', hashedPassword, 'admin']);
   }
+
+  // Update existing articles to be hidden (is_hidden = 1) - new workflow
+  db.run("UPDATE articles SET is_hidden = 1 WHERE is_hidden IS NULL OR is_hidden = 0");
 
   // Insert sample articles if empty
   const countResult = db.exec("SELECT COUNT(*) as count FROM articles");
@@ -161,7 +170,7 @@ async function initDatabase() {
       }
     ];
 
-    const stmt = db.prepare("INSERT INTO articles (title, summary, content, category, image, author) VALUES (?, ?, ?, ?, ?, ?)");
+    const stmt = db.prepare("INSERT INTO articles (title, summary, content, category, image, author, is_hidden) VALUES (?, ?, ?, ?, ?, ?, 0)");
     for (const article of sampleArticles) {
       stmt.run([article.title, article.summary, article.content, article.category, null, article.author]);
     }
@@ -200,54 +209,28 @@ if (!fs.existsSync(VIDEOS_DIR)) fs.mkdirSync(VIDEOS_DIR, { recursive: true });
 app.use('/uploads', express.static(UPLOADS_DIR));
 app.use('/videos', express.static(VIDEOS_DIR));
 
-// ============ GEO BLOCK: Block Vietnam IPs (2-octet prefix matching) ============
-// All Vietnam IP ranges by first two octets
-const VN_IP_PREFIXES = [
-  // All Vietnam first octets
-  '1.', '14.', '27.', '42.', '43.', '49.', '58.', '61.', '101.', '102.', '103.',
-  '106.', '111.', '112.', '113.', '115.', '116.', '117.', '118.', '119.',
-  '123.', '124.', '125.', '171.', '175.', '180.', '183.', '202.', '203.',
-  '210.', '222.', '223.'
-];
+// ============ GEO BLOCK: Block Vietnam, Bangladesh, India, Cape Verde, Egypt, Pakistan, Indonesia, Malaysia, Thailand (using geoip-lite) ============
 
-// IPv6 Vietnam prefixes
-const VN_IPV6_PREFIXES = [
-  '2001:', '2400:', '2404:', '2405:', '2406:', '2407:', '2408:', '2409:',
-  '2410:', '2411:', '2412:', '2413:', '2414:', '2415:', '2416:', '2417:',
-  '2418:', '2419:', '2420:', '2421:', '2422:', '2423:', '2424:', '2425:',
-  '2401:', '2402:', '2403:', '2404:', '2405:', '2406:', '2407:', '2408:',
-  '2409:', '2410:', '2411:', '2412:', '2413:', '2414:', '2415:', '2416:',
-  '2417:', '2418:', '2419:', '2420:', '2421:', '2422:', '2423:', '2424:',
-  '2425:', '2426:', '2427:', '2428:', '2429:', '2430:', '2431:', '2432:',
-  '2433:', '2434:', '2435:', '2436:', '2437:', '2438:', '2439:', '2440:',
-  '2441:', '2442:', '2443:', '2444:', '2445:', '2446:', '2447:', '2448:',
-  '2449:', '2450:', '2451:', '2452:', '2453:', '2454:', '2455:', '2456:',
-  '2457:', '2458:', '2459:', '2460:', '2461:', '2462:', '2463:', '2464:',
-  '2465:', '2466:', '2467:', '2468:', '2469:', '2470:', '2471:', '2472:',
-  '2473:', '2474:', '2475:', '2476:', '2477:', '2478:', '2479:', '2480:',
-  '2481:', '2482:', '2483:', '2484:', '2485:', '2486:', '2487:', '2488:',
-  '2a00:', '2a01:', '2a02:', '2a03:', '2a04:', '2a05:', '2a06:', '2a07:',
-  '2a08:', '2a09:', '2a10:', '2a11:', '2a12:', '2a13:', '2a14:', '2a15:',
-  '2a16:', '2a17:', '2a18:', '2a19:', '2a20:', '2a21:', '2a22:', '2a23:'
-];
+const BLOCKED_COUNTRIES = ['VN', 'BD', 'IN', 'CV', 'EG', 'PK', 'ID', 'MY', 'TH'];
 
-function isVietnameseIP(ip) {
+function isBlockedCountryIP(ip) {
   if (!ip) return false;
 
   // Clean IPv6 mapped IPv4
   const cleanIP = ip.replace(/^::ffff:/i, '').split(':')[0];
 
-  // Check for IPv6
-  if (ip.includes(':') && !cleanIP.includes('.')) {
-    for (const prefix of VN_IPV6_PREFIXES) {
-      if (ip.toLowerCase().startsWith(prefix)) return true;
+  if (!cleanIP || !/^\d+\.\d+\.\d+\.\d+$/.test(cleanIP)) return false;
+
+  const geo = geoip.lookup(cleanIP);
+  if (geo && geo.country) {
+    const isBlocked = BLOCKED_COUNTRIES.includes(geo.country);
+    if (isBlocked) {
+      console.log(`[GEO-BLOCK] Blocked ${cleanIP} from ${geo.country} (${geo.city || 'unknown'})`);
     }
-    return false;
+    return isBlocked;
   }
 
-  // Check IPv4 first octet
-  const firstOctet = cleanIP.split('.')[0] + '.';
-  return VN_IP_PREFIXES.includes(firstOctet);
+  return false;
 }
 
 app.use((req, res, next) => {
@@ -268,9 +251,10 @@ app.use((req, res, next) => {
   clientIP = (clientIP || '').replace(/^::ffff:/i, '').split(':')[0];
 
   // Debug log (remove in production)
-  console.log(`[GEO] IP: ${clientIP}, Path: ${req.path}`);
+  const geo = geoip.lookup(clientIP);
+  console.log(`[GEO] IP: ${clientIP}, Geo: ${JSON.stringify(geo)}, Path: ${req.path}`);
 
-  if (isVietnameseIP(clientIP)) {
+  if (isBlockedCountryIP(clientIP)) {
     // Return generic 404 - don't reveal it's a geo block
     return res.status(404).send(`
       <!DOCTYPE html>
@@ -420,17 +404,17 @@ function getFakeViews(article) {
   return Math.min(views, 99999);
 }
 
-// API: Get articles
+// API: Get articles (public - excludes hidden articles)
 app.get('/api/articles', (req, res) => {
   const { category, limit, offset, page, pageSize } = req.query;
-  let query = 'SELECT * FROM articles';
-  let countQuery = 'SELECT COUNT(*) as total FROM articles';
+  let query = 'SELECT * FROM articles WHERE is_hidden = 0 OR is_hidden IS NULL';
+  let countQuery = 'SELECT COUNT(*) as total FROM articles WHERE is_hidden = 0 OR is_hidden IS NULL';
   const params = [];
   const countParams = [];
 
   if (category && category !== 'All') {
-    query += ' WHERE category = ?';
-    countQuery += ' WHERE category = ?';
+    query += ' AND category = ?';
+    countQuery += ' AND category = ?';
     params.push(category);
     countParams.push(category);
   }
@@ -446,9 +430,9 @@ app.get('/api/articles', (req, res) => {
   params.push(ps, off);
 
   const articles = queryAll(query, params);
-  const totalResult = db.exec(countParams.length > 0 
-    ? `SELECT COUNT(*) FROM articles WHERE category = '${countParams[0]}'`
-    : 'SELECT COUNT(*) FROM articles');
+  const totalResult = db.exec(countParams.length > 0
+    ? `SELECT COUNT(*) FROM articles WHERE (is_hidden = 0 OR is_hidden IS NULL) AND category = '${countParams[0]}'`
+    : 'SELECT COUNT(*) FROM articles WHERE is_hidden = 0 OR is_hidden IS NULL');
   const total = totalResult[0].values[0][0];
 
   // Attach avatar and fake views to each article
@@ -461,11 +445,21 @@ app.get('/api/articles', (req, res) => {
   res.json(articlesWithMeta);
 });
 
-// API: Search articles
+// API: Get all articles (admin - includes hidden)
+app.get('/api/admin/articles/all', requireAuth, (req, res) => {
+  const articles = queryAll('SELECT * FROM articles ORDER BY created_at DESC');
+  const articlesWithMeta = articles.map(a => {
+    const journalist = getJournalistByName(a.author) || JOURNALIST_AVATARS[a.id % JOURNALIST_AVATARS.length];
+    return { ...a, author_avatar: journalist.avatar, views: getFakeViews(a) };
+  });
+  res.json(articlesWithMeta);
+});
+
+// API: Search articles (public - excludes hidden)
 app.get('/api/articles/search/:query', (req, res) => {
   const q = '%' + req.params.query + '%';
   const articles = queryAll(
-    'SELECT * FROM articles WHERE title LIKE ? OR summary LIKE ? OR content LIKE ? ORDER BY created_at DESC LIMIT 20',
+    'SELECT * FROM articles WHERE (is_hidden = 0 OR is_hidden IS NULL) AND (title LIKE ? OR summary LIKE ? OR content LIKE ?) ORDER BY created_at DESC LIMIT 20',
     [q, q, q]
   );
   const articlesWithMeta = articles.map(a => {
@@ -552,7 +546,7 @@ app.post('/api/admin/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Admin: Create article
+// Admin: Create article (new articles are hidden by default - must manually show)
 app.post('/api/admin/articles', requireAuth, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]), (req, res) => {
   const { title, summary, content, category, author, existing_image, existing_video, created_at } = req.body;
   const image = req.files?.['image']?.[0] ? '/uploads/' + req.files['image'][0].filename : (existing_image || null);
@@ -561,7 +555,7 @@ app.post('/api/admin/articles', requireAuth, upload.fields([{ name: 'image', max
   const slug = generateSlug(title);
 
   db.run(
-    'INSERT INTO articles (title, summary, content, category, image, video, author, created_at, slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO articles (title, summary, content, category, image, video, author, created_at, slug, is_hidden) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
     [title, summary, content, category || 'General', image, video, author || 'Admin', publishDate, slug]
   );
   saveDatabase();
@@ -595,6 +589,17 @@ app.delete('/api/admin/articles/:id', requireAuth, (req, res) => {
   db.run('DELETE FROM articles WHERE id = ?', [parseInt(req.params.id)]);
   saveDatabase();
   res.json({ success: true });
+});
+
+// Admin: Toggle article visibility (show/hide from homepage)
+app.put('/api/admin/articles/:id/visibility', requireAuth, (req, res) => {
+  const article = queryOne('SELECT * FROM articles WHERE id = ?', [parseInt(req.params.id)]);
+  if (!article) return res.status(404).json({ error: 'Article not found' });
+
+  const newStatus = article.is_hidden === 1 ? 0 : 1;
+  db.run('UPDATE articles SET is_hidden = ? WHERE id = ?', [newStatus, parseInt(req.params.id)]);
+  saveDatabase();
+  res.json({ success: true, is_hidden: newStatus });
 });
 
 // Admin: Upload image (for content editor)
